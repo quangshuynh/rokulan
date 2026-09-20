@@ -14,13 +14,13 @@ describe("error classification", () => {
   it("classifies secure-context type errors as browser blocked", () => {
     const error = classifyDeviceInfoError(new TypeError("Failed to fetch"), { secureContext: true });
     expect(error.code).toBe("browser_blocked");
-    expect(error.message).toMatch(/may be blocked/i);
+    expect(error.message).toMatch(/CORS|private-network/i);
   });
 
-  it("uses an honest unreachable fallback outside a secure context", () => {
-    expect(classifyDeviceInfoError(new TypeError("Failed to fetch")).code).toBe(
-      "device_unreachable",
-    );
+  it("does not misreport opaque direct fetch failures as unreachable", () => {
+    const error = classifyDeviceInfoError(new TypeError("Failed to fetch"));
+    expect(error.code).toBe("browser_blocked");
+    expect(error.message).toMatch(/may have responded/i);
   });
 
   it("classifies non-success device-info HTTP responses as not Roku", () => {
