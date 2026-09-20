@@ -1,4 +1,4 @@
-import { RokuError } from "@/types/roku";
+import { RokuError } from "../../types/roku";
 
 export class RokuHttpError extends Error {
   constructor(
@@ -21,8 +21,9 @@ function isAbortError(error: unknown): boolean {
 
 export function classifyDeviceInfoError(
   error: unknown,
-  options: { secureContext?: boolean } = {},
+  _options: { secureContext?: boolean } = {},
 ): RokuError {
+  void _options;
   if (error instanceof RokuError) return error;
 
   if (error instanceof RokuHttpError && error.status === 403) {
@@ -50,17 +51,9 @@ export function classifyDeviceInfoError(
   }
 
   if (error instanceof TypeError) {
-    if (options.secureContext) {
-      return new RokuError(
-        "browser_blocked",
-        "The browser could not complete the LAN request. It may be blocked by HTTPS/private-network or CORS policy, or the Roku may be unreachable. Browsers do not expose enough detail to tell which.",
-        error,
-      );
-    }
-
     return new RokuError(
-      "device_unreachable",
-      "Could not reach the Roku at that IP address.",
+      "browser_blocked",
+      "Direct browser access failed. The Roku may have responded but browser CORS or private-network policy can hide that response; the Roku may also be unreachable. Use the local bridge for compatible access.",
       error,
     );
   }

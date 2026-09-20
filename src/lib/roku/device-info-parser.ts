@@ -1,5 +1,5 @@
-import type { RokuDeviceInfo } from "@/types/roku";
-import { RokuError } from "@/types/roku";
+import type { RokuDeviceInfo } from "../../types/roku";
+import { RokuError } from "../../types/roku";
 
 function readTag(xml: string, tagName: string): string | undefined {
   const match = new RegExp(`<${tagName}(?:\\s[^>]*)?>([^<]*)</${tagName}>`, "i").exec(xml);

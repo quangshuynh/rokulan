@@ -1,4 +1,4 @@
-import { RokuError } from "@/types/roku";
+import { RokuError } from "../../types/roku";
 
 const IPV4_SEGMENT = "(?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)";
 const IPV4_PATTERN = new RegExp(`^${IPV4_SEGMENT}(?:\\.${IPV4_SEGMENT}){3}$`);

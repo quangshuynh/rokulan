@@ -1,5 +1,5 @@
-import { normalizePrivateIPv4 } from "@/lib/network/ipv4";
-import { SUPPORTED_COMMANDS } from "@/lib/roku/commands";
+import { normalizePrivateIPv4 } from "../network/ipv4";
+import { SUPPORTED_COMMANDS } from "./commands";
 
 export type RokuPath = "/query/device-info" | `/keypress/${(typeof SUPPORTED_COMMANDS)[number]}`;
 

@@ -2,9 +2,11 @@
 
 import { FormEvent, useMemo, useState } from "react";
 import { BrowserDiscoveryProvider } from "@/features/discovery/browser-discovery-provider";
-import type { RokuDeviceInfo, SavedRokuDevice } from "@/types/roku";
+import type { RokuDeviceInfo, RokuTransportMode, SavedRokuDevice } from "@/types/roku";
 
 interface ConnectionPanelProps {
+  transportMode: RokuTransportMode;
+  onTransportModeChange: (mode: RokuTransportMode) => void;
   savedDevices: SavedRokuDevice[];
   onConnect: (ip: string) => Promise<void>;
   onRemoveSavedDevice: (ip: string) => void;
@@ -13,6 +15,8 @@ interface ConnectionPanelProps {
 }
 
 export function ConnectionPanel({
+  transportMode,
+  onTransportModeChange,
   savedDevices,
   onConnect,
   onRemoveSavedDevice,
@@ -50,9 +54,34 @@ export function ConnectionPanel({
   return (
     <section className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4 shadow-xl shadow-black/25 sm:p-6">
       <h2 className="text-xl font-semibold text-zinc-50">RokuLAN</h2>
-      <p className="mt-2 text-sm text-zinc-300">Control your Roku from your browser.</p>
+      <p className="mt-2 text-sm text-zinc-300">A browser UI for controlling Roku devices on your LAN.</p>
 
       <form className="mt-5 flex flex-col gap-3" onSubmit={handleSubmit}>
+        <fieldset className="space-y-2">
+          <legend className="text-sm font-medium text-zinc-200">Connection transport</legend>
+          <label className="flex min-h-11 cursor-pointer items-start gap-3 rounded-xl border border-zinc-700 p-3">
+            <input
+              type="radio"
+              name="transport"
+              value="bridge"
+              checked={transportMode === "bridge"}
+              onChange={() => onTransportModeChange("bridge")}
+              className="mt-1"
+            />
+            <span><span className="block text-sm font-medium">Local bridge (recommended)</span><span className="block text-xs text-zinc-400">Compatible local access outside the browser CORS sandbox.</span></span>
+          </label>
+          <label className="flex min-h-11 cursor-pointer items-start gap-3 rounded-xl border border-zinc-700 p-3">
+            <input
+              type="radio"
+              name="transport"
+              value="direct"
+              checked={transportMode === "direct"}
+              onChange={() => onTransportModeChange("direct")}
+              className="mt-1"
+            />
+            <span><span className="block text-sm font-medium">Direct browser (experimental)</span><span className="block text-xs text-zinc-400">Useful for diagnostics; Roku CORS commonly blocks readable responses.</span></span>
+          </label>
+        </fieldset>
         <label htmlFor="roku-ip" className="text-sm font-medium text-zinc-200">
           Roku IP address
         </label>
@@ -69,7 +98,7 @@ export function ConnectionPanel({
           aria-describedby="ip-help"
         />
         <p id="ip-help" className="text-xs text-zinc-400">
-          Private/local IPv4 only. Roku addresses never leave your browser.
+          Private IPv4 only. Addresses are never sent to RokuLAN cloud servers.
         </p>
 
         <div className="flex flex-col gap-2 sm:flex-row">

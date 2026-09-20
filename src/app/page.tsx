@@ -4,14 +4,15 @@ import { useMemo, useState } from "react";
 import { ConnectionPanel } from "@/features/connection/connection-panel";
 import { RemoteControl } from "@/features/remote/remote-control";
 import { normalizePrivateIPv4 } from "@/lib/network/ipv4";
-import { createRokuClient } from "@/lib/roku/client";
+import { createDirectBrowserClient } from "@/lib/roku/client";
+import { createLocalBridgeClient } from "@/lib/roku/local-bridge-client";
 import { classifyDeviceInfoError, classifyKeypressError } from "@/lib/roku/errors";
 import {
   loadSavedDevices,
   rememberDevice,
   removeSavedDevice,
 } from "@/lib/storage/saved-devices";
-import type { RokuCommand, RokuDeviceInfo, SavedRokuDevice } from "@/types/roku";
+import type { RokuCommand, RokuDeviceInfo, RokuTransportMode, SavedRokuDevice } from "@/types/roku";
 
 function secureContextEnabled(): boolean {
   if (typeof window === "undefined") {
@@ -22,7 +23,11 @@ function secureContextEnabled(): boolean {
 }
 
 export default function Home() {
-  const client = useMemo(() => createRokuClient(), []);
+  const [transportMode, setTransportMode] = useState<RokuTransportMode>("bridge");
+  const client = useMemo(
+    () => (transportMode === "bridge" ? createLocalBridgeClient() : createDirectBrowserClient()),
+    [transportMode],
+  );
   const [savedDevices, setSavedDevices] = useState<SavedRokuDevice[]>(() =>
     loadSavedDevices(typeof window === "undefined" ? null : window.localStorage),
   );
@@ -80,6 +85,13 @@ export default function Home() {
     <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-4 py-8 sm:px-6 lg:flex-row lg:items-start lg:py-10">
       <div className="w-full lg:max-w-md">
         <ConnectionPanel
+          transportMode={transportMode}
+          onTransportModeChange={(mode) => {
+            setTransportMode(mode);
+            setConnectedDevice(null);
+            setConnectionError(null);
+            setBlockedControls(false);
+          }}
           savedDevices={savedDevices}
           onConnect={connect}
           onRemoveSavedDevice={removeSaved}
