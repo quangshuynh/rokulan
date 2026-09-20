@@ -42,10 +42,10 @@ const SYSTEM_BUTTONS: CommandButton[] = [
 
 function buttonClassName(isPrimary = false): string {
   return [
-    "min-h-12 rounded-xl border border-zinc-700/80 bg-zinc-900/70 px-4 py-3 text-sm font-medium text-zinc-100",
-    "shadow-sm shadow-black/20 transition motion-reduce:transition-none hover:bg-zinc-800",
-    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950",
-    isPrimary ? "text-base" : "",
+    "min-h-12 rounded-xl border border-violet-400/20 bg-zinc-900/75 px-3 py-3 text-sm font-medium text-zinc-100",
+    "shadow-sm shadow-black/20 transition motion-reduce:transform-none motion-reduce:transition-none hover:border-violet-400/60 hover:bg-violet-500/15 active:scale-[0.98] disabled:opacity-55",
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950",
+    isPrimary ? "border-violet-300/60 bg-violet-600/30 text-base shadow-[0_0_22px_rgba(139,92,246,0.2)]" : "",
   ].join(" ");
 }
 
@@ -75,9 +75,10 @@ export function RemoteControl({
   });
 
   return (
-    <section className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4 shadow-xl shadow-black/25 sm:p-6">
+    <section className="rounded-3xl border border-violet-400/25 bg-zinc-950/78 p-4 shadow-[0_0_45px_rgba(126,34,206,0.15)] backdrop-blur-md sm:p-6">
       <header className="mb-4 flex flex-col gap-1">
-        <h2 className="text-lg font-semibold text-zinc-50">{device.friendlyName}</h2>
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-violet-300">Remote online</p>
+        <h2 className="text-xl font-semibold text-zinc-50">{device.friendlyName}</h2>
         <p className="text-sm text-zinc-300">
           Connected to {device.ip} • {device.modelName}
         </p>
@@ -92,9 +93,9 @@ export function RemoteControl({
         </div>
       ) : null}
 
-      <div className="grid gap-4 lg:grid-cols-[1fr_1fr]">
+      <div className="grid gap-5 lg:grid-cols-[1.15fr_0.85fr]">
         <div className="space-y-3">
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-3 gap-2 rounded-3xl border border-violet-400/15 bg-black/30 p-3 shadow-inner shadow-black/50 sm:gap-3 sm:p-4">
             <span />
             <button
               type="button"

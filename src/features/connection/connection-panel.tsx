@@ -53,34 +53,37 @@ export function ConnectionPanel({
   };
 
   return (
-    <section className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4 shadow-xl shadow-black/25 sm:p-6">
-      <h2 className="text-xl font-semibold text-zinc-50">RokuLAN</h2>
-      <p className="mt-2 text-sm text-zinc-300">A browser UI for controlling Roku devices on your LAN.</p>
+    <section className="min-w-0 max-w-full overflow-hidden rounded-3xl border border-violet-400/25 bg-zinc-950/78 p-4 shadow-[0_0_45px_rgba(126,34,206,0.15)] backdrop-blur-md sm:p-6">
+      <div className="mb-6 border-b border-violet-400/15 pb-5">
+        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-violet-300">Local network remote</p>
+        <h1 className="mt-1 bg-gradient-to-r from-white via-violet-100 to-fuchsia-300 bg-clip-text text-3xl font-black tracking-tight text-transparent sm:text-4xl">RokuLAN</h1>
+        <p className="mt-2 text-sm text-zinc-300">Control your Roku across your local network.</p>
+      </div>
 
       <form className="mt-5 flex flex-col gap-3" onSubmit={handleSubmit}>
         <fieldset className="space-y-2">
           <legend className="text-sm font-medium text-zinc-200">Connection transport</legend>
-          <label className="flex min-h-11 cursor-pointer items-start gap-3 rounded-xl border border-zinc-700 p-3">
+          <label className={`flex min-h-14 max-w-full cursor-pointer items-start gap-3 rounded-xl border p-3 transition motion-reduce:transition-none ${transportMode === "bridge" ? "border-violet-400/70 bg-violet-500/10" : "border-zinc-700/80 bg-black/20 hover:border-violet-400/40"}`}>
             <input
               type="radio"
               name="transport"
               value="bridge"
               checked={transportMode === "bridge"}
               onChange={() => onTransportModeChange("bridge")}
-              className="mt-1"
+              className="mt-1 size-4 accent-violet-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-300"
             />
-            <span><span className="block text-sm font-medium">Local bridge (recommended)</span><span className="block text-xs text-zinc-400">Compatible local access outside the browser CORS sandbox.</span></span>
+            <span className="min-w-0"><span className="block text-sm font-medium">Local bridge (recommended)</span><span className="block text-xs text-zinc-400">Compatible local access outside the browser CORS sandbox.</span></span>
           </label>
-          <label className="flex min-h-11 cursor-pointer items-start gap-3 rounded-xl border border-zinc-700 p-3">
+          <label className={`flex min-h-14 max-w-full cursor-pointer items-start gap-3 rounded-xl border p-3 transition motion-reduce:transition-none ${transportMode === "direct" ? "border-violet-400/70 bg-violet-500/10" : "border-zinc-700/80 bg-black/20 hover:border-violet-400/40"}`}>
             <input
               type="radio"
               name="transport"
               value="direct"
               checked={transportMode === "direct"}
               onChange={() => onTransportModeChange("direct")}
-              className="mt-1"
+              className="mt-1 size-4 accent-violet-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-300"
             />
-            <span><span className="block text-sm font-medium">Direct browser (experimental)</span><span className="block text-xs text-zinc-400">Useful for diagnostics; Roku CORS commonly blocks readable responses.</span></span>
+            <span className="min-w-0"><span className="block text-sm font-medium">Direct browser (experimental)</span><span className="block text-xs text-zinc-400">Useful for diagnostics; Roku CORS commonly blocks readable responses.</span></span>
           </label>
         </fieldset>
         <label htmlFor="roku-ip" className="text-sm font-medium text-zinc-200">
@@ -90,12 +93,15 @@ export function ConnectionPanel({
           id="roku-ip"
           name="roku-ip"
           type="text"
-          inputMode="numeric"
+          inputMode="decimal"
           autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="none"
+          spellCheck={false}
           placeholder="192.168.1.12"
           value={ip}
           onChange={(event) => setIp(event.target.value)}
-          className="min-h-12 rounded-xl border border-zinc-700 bg-zinc-950 px-3 text-zinc-100 placeholder:text-zinc-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+          className="min-h-12 rounded-xl border border-violet-400/30 bg-black/45 px-3 font-mono text-base text-zinc-100 caret-violet-300 placeholder:text-zinc-600 focus-visible:border-violet-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/70"
           aria-describedby="ip-help"
         />
         <p id="ip-help" className="text-xs text-zinc-400">
@@ -105,14 +111,14 @@ export function ConnectionPanel({
         <div className="flex flex-col gap-2 sm:flex-row">
           <button
             type="submit"
-            className="min-h-12 rounded-xl bg-sky-500 px-4 font-medium text-sky-950 transition hover:bg-sky-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 disabled:cursor-not-allowed disabled:opacity-60 motion-reduce:transition-none"
+            className="min-h-12 flex-1 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 px-5 font-semibold text-white shadow-[0_0_24px_rgba(147,51,234,0.28)] transition hover:from-violet-500 hover:to-fuchsia-500 active:translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-300 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 disabled:opacity-50 motion-reduce:transform-none motion-reduce:transition-none"
             disabled={isConnecting}
           >
             {isConnecting ? "Connecting..." : "Connect"}
           </button>
           <button
             type="button"
-            className="min-h-12 rounded-xl border border-zinc-700 bg-zinc-900 px-4 font-medium text-zinc-100 transition hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 motion-reduce:transition-none"
+            className="min-h-12 rounded-xl border border-zinc-700 bg-zinc-900/70 px-4 font-medium text-zinc-100 transition hover:border-violet-400/50 hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 motion-reduce:transition-none"
             onClick={() => void handleFindDevices()}
           >
             Find devices
@@ -121,13 +127,13 @@ export function ConnectionPanel({
       </form>
 
       {connectionError ? (
-        <p role="alert" className="mt-3 rounded-xl border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-100">
+        <p role="alert" className="mt-3 rounded-xl border border-red-400/40 bg-red-950/55 px-3 py-2 text-sm text-red-100 shadow-[inset_3px_0_0_rgba(248,113,113,0.7)]">
           {connectionError}
         </p>
       ) : null}
 
       {discoveryMessage ? (
-        <p className="mt-3 rounded-xl border border-zinc-700 bg-zinc-950/80 px-3 py-2 text-sm text-zinc-200">
+        <p className="mt-3 rounded-xl border border-violet-400/30 bg-violet-950/35 px-3 py-2 text-sm text-violet-100">
           {discoveryMessage}
         </p>
       ) : null}
@@ -143,8 +149,8 @@ export function ConnectionPanel({
         ) : (
           <ul className="mt-2 space-y-2">
             {savedDevicesState.devices.map((saved) => (
-              <li key={saved.ip} className="rounded-xl border border-zinc-800 bg-zinc-950/70 p-3">
-                <div className="flex items-start justify-between gap-3">
+              <li key={saved.ip} className="rounded-xl border border-violet-400/15 bg-black/30 p-3">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div>
                     <p className="text-sm font-medium text-zinc-100">{saved.friendlyName}</p>
                     <p className="text-xs text-zinc-400">
@@ -154,14 +160,14 @@ export function ConnectionPanel({
                   <div className="flex gap-2">
                     <button
                       type="button"
-                      className="min-h-11 rounded-lg border border-zinc-700 px-3 py-2 text-xs text-zinc-100 hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+                      className="min-h-11 rounded-lg border border-violet-400/40 px-3 py-2 text-xs text-violet-100 hover:bg-violet-500/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400"
                       onClick={() => void onConnect(saved.ip)}
                     >
                       Reconnect
                     </button>
                     <button
                       type="button"
-                      className="min-h-11 rounded-lg border border-zinc-700 px-3 py-2 text-xs text-zinc-100 hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+                      className="min-h-11 rounded-lg border border-zinc-700 px-3 py-2 text-xs text-zinc-200 hover:border-red-400/50 hover:bg-red-500/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400"
                       onClick={() => onRemoveSavedDevice(saved.ip)}
                     >
                       Remove

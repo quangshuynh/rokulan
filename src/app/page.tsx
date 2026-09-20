@@ -89,8 +89,8 @@ export default function Home() {
   };
 
   return (
-    <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-4 py-8 sm:px-6 lg:flex-row lg:items-start lg:py-10">
-      <div className="w-full lg:max-w-md">
+    <main className="relative mx-auto flex min-h-screen w-full max-w-[100vw] flex-1 flex-col gap-6 overflow-hidden px-3 py-5 sm:px-6 sm:py-8 lg:max-w-6xl lg:flex-row lg:items-start lg:py-10">
+      <div className="min-w-0 w-full lg:max-w-md">
         <ConnectionPanel
           transportMode={transportMode}
           onTransportModeChange={(mode) => {
@@ -107,7 +107,7 @@ export default function Home() {
         />
       </div>
 
-      <div className="w-full">
+      <div className="min-w-0 w-full">
         {connectedDevice ? (
           <RemoteControl
             device={connectedDevice}
@@ -116,8 +116,9 @@ export default function Home() {
             onClearBlockedNotice={() => setBlockedControls(false)}
           />
         ) : (
-          <section className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-8 text-center text-zinc-300">
-            Connect to a Roku device to show the remote.
+          <section className="max-w-full overflow-hidden rounded-3xl border border-violet-400/15 bg-zinc-950/55 p-6 text-center text-zinc-300 backdrop-blur-sm sm:p-8">
+            <div className="mx-auto mb-4 grid size-14 place-items-center rounded-2xl border border-violet-400/30 bg-violet-500/10 text-2xl text-violet-300" aria-hidden="true">⌁</div>
+            Connect to a Roku device to activate the remote.
           </section>
         )}
       </div>
