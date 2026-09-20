@@ -109,6 +109,7 @@ Roku discovery commonly uses SSDP over UDP multicast (`239.255.255.250:1900`). S
 - The bridge binds to `127.0.0.1`, validates Host and exact Origin values, permits only two semantic operations, requires JSON for keypresses, limits request/response sizes, and reuses the RFC 1918 and command allowlists.
 
 See [Local bridge architecture and threat model](docs/local-bridge.md) for the API, configuration, and residual risks.
+See [Zero-clone distribution and mobile architecture](docs/distribution-architecture.md) for current browser/Roku constraints, candidate models, and the manual test matrix.
 
 ## Local development
 
