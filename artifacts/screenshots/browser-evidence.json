@@ -1,0 +1,163 @@
+{
+  "browserMessages": [
+    {
+      "width": 430,
+      "height": 932,
+      "type": "error",
+      "text": "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+    }
+  ],
+  "requestFailures": [
+    {
+      "width": 430,
+      "height": 932,
+      "url": "http://127.0.0.1:8787/v1/roku/192.168.1.25/device",
+      "error": "net::ERR_CONNECTION_REFUSED"
+    }
+  ],
+  "layoutAudits": [
+    {
+      "filename": "rokulan-mobile-375-disconnected.png",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "document": {
+        "clientWidth": 375,
+        "scrollWidth": 375,
+        "scrollHeight": 977
+      },
+      "horizontalOverflow": false
+    },
+    {
+      "filename": "rokulan-mobile-390-ip-entry.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "document": {
+        "clientWidth": 390,
+        "scrollWidth": 390,
+        "scrollHeight": 961
+      },
+      "horizontalOverflow": false
+    },
+    {
+      "filename": "rokulan-mobile-390-full-page.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "document": {
+        "clientWidth": 390,
+        "scrollWidth": 390,
+        "scrollHeight": 961
+      },
+      "horizontalOverflow": false
+    },
+    {
+      "filename": "rokulan-mobile-430-disconnected.png",
+      "viewport": {
+        "width": 430,
+        "height": 932
+      },
+      "document": {
+        "clientWidth": 430,
+        "scrollWidth": 430,
+        "scrollHeight": 932
+      },
+      "horizontalOverflow": false
+    },
+    {
+      "filename": "rokulan-tablet-768-disconnected.png",
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "document": {
+        "clientWidth": 768,
+        "scrollWidth": 768,
+        "scrollHeight": 1024
+      },
+      "horizontalOverflow": false
+    },
+    {
+      "filename": "rokulan-desktop-1440-disconnected.png",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "document": {
+        "clientWidth": 1440,
+        "scrollWidth": 1440,
+        "scrollHeight": 900
+      },
+      "horizontalOverflow": false
+    },
+    {
+      "filename": "rokulan-desktop-1440-full-page.png",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "document": {
+        "clientWidth": 1440,
+        "scrollWidth": 1440,
+        "scrollHeight": 900
+      },
+      "horizontalOverflow": false
+    },
+    {
+      "filename": "rokulan-bridge-unavailable.png",
+      "viewport": {
+        "width": 430,
+        "height": 932
+      },
+      "document": {
+        "clientWidth": 430,
+        "scrollWidth": 430,
+        "scrollHeight": 991
+      },
+      "horizontalOverflow": false
+    },
+    {
+      "filename": "rokulan-invalid-ip.png",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "document": {
+        "clientWidth": 375,
+        "scrollWidth": 375,
+        "scrollHeight": 1047
+      },
+      "horizontalOverflow": false
+    },
+    {
+      "filename": "rokulan-mobile-connected-synthetic.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "document": {
+        "clientWidth": 390,
+        "scrollWidth": 390,
+        "scrollHeight": 1553
+      },
+      "horizontalOverflow": false
+    },
+    {
+      "filename": "rokulan-desktop-1440-connected-synthetic.png",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "document": {
+        "clientWidth": 1440,
+        "scrollWidth": 1440,
+        "scrollHeight": 900
+      },
+      "horizontalOverflow": false
+    }
+  ]
+}
