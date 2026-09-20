@@ -10,6 +10,10 @@ RokuLAN web UI -> http://127.0.0.1:8787 -> http://<validated-private-ip>:8060
 
 The current dependency-free Node/TypeScript foundation is intended for development and architecture validation. It does not include an installer, background startup, service manager, tray UI, auto-update, SSDP, or native GUI.
 
+## Verified integration milestone
+
+The complete `browser UI -> loopback bridge -> Roku ECP -> real Roku` path has been tested successfully on one hardware/browser setup, with identifying device data excluded. In that setup, the bridge allowed the UI to identify and control the device despite direct browser ECP responses being unreadable because of CORS. Direct-browser mode remains experimental and useful for diagnostics; compatibility can vary by browser, operating system, Roku model, firmware, and network policy.
+
 ## API
 
 - `GET /v1/roku/<validated-ip>/device` performs only `GET /query/device-info` and returns the small typed Roku device model.
