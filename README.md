@@ -53,6 +53,8 @@ Roku devices expose ECP on the local network, typically:
 
 The UI depends only on the typed `RokuClient` interface. It can use the recommended local-bridge client or the experimental direct-browser client without duplicating domain or command logic.
 
+The recommended local-bridge path has completed a successful end-to-end test with real Roku hardware: browser UI to loopback bridge to Roku ECP. On that tested setup, the bridge resolved the CORS limitation that prevented direct browser JavaScript from reading Roku responses. This is one sanitized hardware result, not a claim of universal browser, platform, firmware, or model compatibility.
+
 ## Browser/LAN limitations
 
 RokuLAN uses a browser UI with a small local companion bridge. It does **not** route private Roku IPs through a cloud backend. Direct browser ECP remains available only as an experimental diagnostic transport.
