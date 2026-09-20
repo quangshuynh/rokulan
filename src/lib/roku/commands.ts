@@ -1,4 +1,4 @@
-import type { RokuCommand } from "@/types/roku";
+import type { RokuCommand } from "../../types/roku";
 
 export const SUPPORTED_COMMANDS: readonly RokuCommand[] = [
   "Home",
@@ -22,4 +22,8 @@ export const SUPPORTED_COMMANDS: readonly RokuCommand[] = [
 
 export function toKeypressPath(command: RokuCommand): `/keypress/${RokuCommand}` {
   return `/keypress/${command}`;
+}
+
+export function isRokuCommand(value: unknown): value is RokuCommand {
+  return typeof value === "string" && SUPPORTED_COMMANDS.some((command) => command === value);
 }

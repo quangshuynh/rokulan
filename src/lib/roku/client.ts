@@ -1,8 +1,8 @@
-import type { RokuCommand, RokuDeviceInfo } from "@/types/roku";
-import { parseRokuDeviceInfo } from "@/lib/roku/device-info-parser";
-import { RokuHttpError } from "@/lib/roku/errors";
-import { toKeypressPath } from "@/lib/roku/commands";
-import { buildRokuUrl } from "@/lib/roku/url";
+import type { RokuCommand, RokuDeviceInfo } from "../../types/roku";
+import { parseRokuDeviceInfo } from "./device-info-parser";
+import { RokuHttpError } from "./errors";
+import { toKeypressPath } from "./commands";
+import { buildRokuUrl, type RokuPath } from "./url";
 
 export interface RokuClient {
   queryDeviceInfo(ip: string): Promise<RokuDeviceInfo>;
@@ -11,10 +11,12 @@ export interface RokuClient {
 
 interface RequestOptions {
   method: "GET" | "POST";
-  path: string;
+  path: RokuPath;
 }
 
-export function createRokuClient(fetchImpl: typeof fetch = fetch): RokuClient {
+const MAX_RESPONSE_BYTES = 1024 * 1024;
+
+export function createDirectBrowserClient(fetchImpl: typeof fetch = fetch): RokuClient {
   async function request(ip: string, options: RequestOptions): Promise<string> {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 5000);
@@ -25,7 +27,15 @@ export function createRokuClient(fetchImpl: typeof fetch = fetch): RokuClient {
         signal: controller.signal,
       });
 
+      const declaredLength = Number(response.headers?.get?.("Content-Length"));
+      if (Number.isFinite(declaredLength) && declaredLength > MAX_RESPONSE_BYTES) {
+        throw new Error("Roku response exceeded the size limit.");
+      }
+
       const text = await response.text();
+      if (new TextEncoder().encode(text).byteLength > MAX_RESPONSE_BYTES) {
+        throw new Error("Roku response exceeded the size limit.");
+      }
       if (!response.ok) {
         throw new RokuHttpError(response.status, options.path, text);
       }
@@ -46,3 +56,6 @@ export function createRokuClient(fetchImpl: typeof fetch = fetch): RokuClient {
     },
   };
 }
+
+/** @deprecated Prefer the transport-specific factory name. */
+export const createRokuClient = createDirectBrowserClient;

@@ -1,0 +1,14 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "target": "ES2022",
+    "outDir": "../dist/bridge",
+    "rootDir": "..",
+    "incremental": false,
+    "noEmit": false
+  },
+  "include": ["./**/*.ts", "../src/lib/network/ipv4.ts", "../src/lib/roku/*.ts", "../src/types/roku.ts"],
+  "exclude": ["./**/*.test.ts", "../src/lib/roku/__tests__"]
+}

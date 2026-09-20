@@ -34,7 +34,7 @@ function normalizeSavedDevices(value: unknown): SavedRokuDevice[] {
     return value.map(asSavedDevice).filter((device): device is SavedRokuDevice => Boolean(device));
   }
 
-  if (isRecord(value) && Array.isArray(value.devices)) {
+  if (isRecord(value) && value.version === STORAGE_VERSION && Array.isArray(value.devices)) {
     return value.devices
       .map(asSavedDevice)
       .filter((device): device is SavedRokuDevice => Boolean(device));
@@ -65,7 +65,11 @@ export function persistSavedDevices(storage: Storage | null, devices: SavedRokuD
     devices,
   };
 
-  storage.setItem(STORAGE_KEY, JSON.stringify(payload));
+  try {
+    storage.setItem(STORAGE_KEY, JSON.stringify(payload));
+  } catch {
+    // Persistence is optional; storage can be disabled, full, or denied.
+  }
 }
 
 export function rememberDevice(storage: Storage | null, device: RokuDeviceInfo): SavedRokuDevice[] {

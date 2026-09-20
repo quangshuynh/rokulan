@@ -1,9 +1,15 @@
-import type { RokuDeviceInfo } from "@/types/roku";
-import { RokuError } from "@/types/roku";
+import type { RokuDeviceInfo } from "../../types/roku";
+import { RokuError } from "../../types/roku";
 
 function readTag(xml: string, tagName: string): string | undefined {
-  const match = new RegExp(`<${tagName}>([^<]*)</${tagName}>`).exec(xml);
-  return match?.[1]?.trim();
+  const match = new RegExp(`<${tagName}(?:\\s[^>]*)?>([^<]*)</${tagName}>`, "i").exec(xml);
+  return match?.[1]?.trim().replace(/&(?:amp|lt|gt|quot|apos);/g, (entity) => ({
+    "&amp;": "&",
+    "&lt;": "<",
+    "&gt;": ">",
+    "&quot;": '"',
+    "&apos;": "'",
+  })[entity] ?? entity);
 }
 
 function parseBoolean(value?: string): boolean {
@@ -17,28 +23,30 @@ function parseNumber(value?: string): number | undefined {
 }
 
 export function parseRokuDeviceInfo(xml: string, ip: string): RokuDeviceInfo {
-  if (!xml.includes("<device-info>")) {
+  const document = xml.match(/<device-info(?:\s[^>]*)?>([\s\S]*)<\/device-info>\s*$/i);
+  if (!document || /<!DOCTYPE|<!ENTITY/i.test(xml)) {
     throw new RokuError(
       "malformed_device_response",
       "Device response was not a valid Roku device-info payload.",
     );
   }
 
-  const friendlyName = readTag(xml, "friendly-device-name");
-  const modelName = readTag(xml, "model-name");
-
-  if (!friendlyName || !modelName) {
-    throw new RokuError(
-      "malformed_device_response",
-      "Device-info payload is missing required Roku fields.",
-    );
-  }
-
-  const vendorName = readTag(xml, "vendor-name")?.toLowerCase();
-  if (vendorName && !vendorName.includes("roku")) {
+  const payload = document[1];
+  const vendorName = readTag(payload, "vendor-name");
+  if (vendorName && vendorName.trim().toLowerCase() !== "roku") {
     throw new RokuError(
       "not_roku",
       "The device responded, but it does not appear to be a Roku device.",
+    );
+  }
+
+  const friendlyName = readTag(payload, "friendly-device-name");
+  const modelName = readTag(payload, "model-name");
+
+  if (!vendorName || !friendlyName || !modelName) {
+    throw new RokuError(
+      "malformed_device_response",
+      "Device-info payload is missing required Roku fields.",
     );
   }
 
@@ -46,11 +54,10 @@ export function parseRokuDeviceInfo(xml: string, ip: string): RokuDeviceInfo {
     ip,
     friendlyName,
     modelName,
-    modelNumber: readTag(xml, "model-number"),
-    isTv: parseBoolean(readTag(xml, "is-tv")),
-    screenSize: parseNumber(readTag(xml, "screen-size")),
-    powerMode: readTag(xml, "power-mode"),
-    networkName: readTag(xml, "network-name"),
-    softwareVersion: readTag(xml, "software-version"),
+    modelNumber: readTag(payload, "model-number"),
+    isTv: parseBoolean(readTag(payload, "is-tv")),
+    screenSize: parseNumber(readTag(payload, "screen-size")),
+    powerMode: readTag(payload, "power-mode"),
+    softwareVersion: readTag(payload, "software-version"),
   };
 }

@@ -17,6 +17,8 @@ export type RokuCommand =
   | "PowerOn"
   | "PowerOff";
 
+export type RokuTransportMode = "bridge" | "direct";
+
 export interface RokuDeviceInfo {
   ip: string;
   friendlyName: string;
@@ -25,7 +27,6 @@ export interface RokuDeviceInfo {
   isTv: boolean;
   screenSize?: number;
   powerMode?: string;
-  networkName?: string;
   softwareVersion?: string;
 }
 
@@ -38,10 +39,12 @@ export interface SavedRokuDevice {
 
 export type RokuErrorCode =
   | "invalid_ip"
+  | "non_private_ip"
   | "device_unreachable"
   | "request_timeout"
   | "not_roku"
   | "browser_blocked"
+  | "bridge_unavailable"
   | "http_403"
   | "malformed_device_response"
   | "disconnected_device"
