@@ -64,6 +64,7 @@ export default function Home() {
 
     try {
       await client.sendKeypress(connectedDevice.ip, command);
+      setConnectionError(null);
     } catch (error) {
       const classified = classifyKeypressError(error);
       if (classified.code === "http_403") {

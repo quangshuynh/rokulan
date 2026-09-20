@@ -17,19 +17,24 @@ export function isPrivateOrLocalIPv4(value: string): boolean {
   return (
     a === 10 ||
     (a === 172 && b >= 16 && b <= 31) ||
-    (a === 192 && b === 168) ||
-    (a === 169 && b === 254) ||
-    a === 127
+    (a === 192 && b === 168)
   );
 }
 
 export function normalizePrivateIPv4(value: string): string {
   const trimmed = value.trim();
 
-  if (!isValidIPv4(trimmed) || !isPrivateOrLocalIPv4(trimmed)) {
+  if (!isValidIPv4(trimmed)) {
     throw new RokuError(
       "invalid_ip",
-      "Enter a valid private/local IPv4 address (for example 192.168.1.12).",
+      "Enter a valid IPv4 address (for example 192.168.1.12).",
+    );
+  }
+
+  if (!isPrivateOrLocalIPv4(trimmed)) {
+    throw new RokuError(
+      "non_private_ip",
+      "Enter an address in a supported private range: 10.x.x.x, 172.16-31.x.x, or 192.168.x.x.",
     );
   }
 

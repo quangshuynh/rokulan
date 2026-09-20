@@ -33,6 +33,14 @@ export function classifyDeviceInfoError(
     );
   }
 
+  if (error instanceof RokuHttpError) {
+    return new RokuError(
+      "not_roku",
+      `A device responded with HTTP ${error.status}, but not with Roku device information.`,
+      error,
+    );
+  }
+
   if (isAbortError(error)) {
     return new RokuError(
       "request_timeout",
@@ -45,7 +53,7 @@ export function classifyDeviceInfoError(
     if (options.secureContext) {
       return new RokuError(
         "browser_blocked",
-        "Your browser blocked the private-network request. Try another browser/device or connect over HTTP in local development.",
+        "The browser could not complete the LAN request. It may be blocked by HTTPS/private-network or CORS policy, or the Roku may be unreachable. Browsers do not expose enough detail to tell which.",
         error,
       );
     }

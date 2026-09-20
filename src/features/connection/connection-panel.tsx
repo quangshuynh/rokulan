@@ -75,14 +75,14 @@ export function ConnectionPanel({
         <div className="flex flex-col gap-2 sm:flex-row">
           <button
             type="submit"
-            className="min-h-12 rounded-xl bg-sky-500 px-4 font-medium text-sky-950 transition hover:bg-sky-400 disabled:cursor-not-allowed disabled:opacity-60"
+            className="min-h-12 rounded-xl bg-sky-500 px-4 font-medium text-sky-950 transition hover:bg-sky-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 disabled:cursor-not-allowed disabled:opacity-60 motion-reduce:transition-none"
             disabled={isConnecting}
           >
             {isConnecting ? "Connecting..." : "Connect"}
           </button>
           <button
             type="button"
-            className="min-h-12 rounded-xl border border-zinc-700 bg-zinc-900 px-4 font-medium text-zinc-100 transition hover:bg-zinc-800"
+            className="min-h-12 rounded-xl border border-zinc-700 bg-zinc-900 px-4 font-medium text-zinc-100 transition hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 motion-reduce:transition-none"
             onClick={() => void handleFindDevices()}
           >
             Find devices
@@ -91,7 +91,7 @@ export function ConnectionPanel({
       </form>
 
       {connectionError ? (
-        <p className="mt-3 rounded-xl border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-100">
+        <p role="alert" className="mt-3 rounded-xl border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-100">
           {connectionError}
         </p>
       ) : null}
@@ -120,14 +120,14 @@ export function ConnectionPanel({
                   <div className="flex gap-2">
                     <button
                       type="button"
-                      className="rounded-lg border border-zinc-700 px-2 py-1 text-xs text-zinc-100 hover:bg-zinc-800"
+                      className="min-h-11 rounded-lg border border-zinc-700 px-3 py-2 text-xs text-zinc-100 hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
                       onClick={() => void onConnect(saved.ip)}
                     >
                       Reconnect
                     </button>
                     <button
                       type="button"
-                      className="rounded-lg border border-zinc-700 px-2 py-1 text-xs text-zinc-100 hover:bg-zinc-800"
+                      className="min-h-11 rounded-lg border border-zinc-700 px-3 py-2 text-xs text-zinc-100 hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
                       onClick={() => onRemoveSavedDevice(saved.ip)}
                     >
                       Remove

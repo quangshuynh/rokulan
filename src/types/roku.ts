@@ -25,7 +25,6 @@ export interface RokuDeviceInfo {
   isTv: boolean;
   screenSize?: number;
   powerMode?: string;
-  networkName?: string;
   softwareVersion?: string;
 }
 
@@ -38,6 +37,7 @@ export interface SavedRokuDevice {
 
 export type RokuErrorCode =
   | "invalid_ip"
+  | "non_private_ip"
   | "device_unreachable"
   | "request_timeout"
   | "not_roku"

@@ -2,7 +2,7 @@ import type { RokuCommand, RokuDeviceInfo } from "@/types/roku";
 import { parseRokuDeviceInfo } from "@/lib/roku/device-info-parser";
 import { RokuHttpError } from "@/lib/roku/errors";
 import { toKeypressPath } from "@/lib/roku/commands";
-import { buildRokuUrl } from "@/lib/roku/url";
+import { buildRokuUrl, type RokuPath } from "@/lib/roku/url";
 
 export interface RokuClient {
   queryDeviceInfo(ip: string): Promise<RokuDeviceInfo>;
@@ -11,7 +11,7 @@ export interface RokuClient {
 
 interface RequestOptions {
   method: "GET" | "POST";
-  path: string;
+  path: RokuPath;
 }
 
 export function createRokuClient(fetchImpl: typeof fetch = fetch): RokuClient {
