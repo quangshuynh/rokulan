@@ -17,9 +17,29 @@ describe("ipv4 validation", () => {
     expect(isPrivateOrLocalIPv4("172.20.1.2")).toBe(true);
     expect(isPrivateOrLocalIPv4("192.168.1.2")).toBe(true);
     expect(isPrivateOrLocalIPv4("8.8.8.8")).toBe(false);
+    expect(isPrivateOrLocalIPv4("127.0.0.1")).toBe(false);
+    expect(isPrivateOrLocalIPv4("169.254.1.2")).toBe(false);
+    expect(isPrivateOrLocalIPv4("172.15.255.255")).toBe(false);
+    expect(isPrivateOrLocalIPv4("172.32.0.0")).toBe(false);
   });
 
-  it("throws for non-private values", () => {
-    expect(() => normalizePrivateIPv4("8.8.8.8")).toThrowError();
+  it("distinguishes malformed and non-private values", () => {
+    try {
+      normalizePrivateIPv4("http://192.168.1.2/path");
+      throw new Error("Expected invalid input to throw");
+    } catch (error) {
+      expect(error).toMatchObject({ code: "invalid_ip" });
+    }
+
+    try {
+      normalizePrivateIPv4("8.8.8.8");
+      throw new Error("Expected public input to throw");
+    } catch (error) {
+      expect(error).toMatchObject({ code: "non_private_ip" });
+    }
+  });
+
+  it("trims a valid private address", () => {
+    expect(normalizePrivateIPv4(" 192.168.1.12 ")).toBe("192.168.1.12");
   });
 });

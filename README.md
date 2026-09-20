@@ -1,6 +1,6 @@
 # RokuLAN
 
-A responsive, open-source web remote for discovering and controlling Roku devices on your local network.
+A responsive, open-source web remote for manually connecting to and controlling Roku devices on your local network.
 
 > RokuLAN is an independent project and is not affiliated with, endorsed by, or sponsored by Roku, Inc.
 
@@ -15,7 +15,7 @@ A responsive, open-source web remote for discovering and controlling Roku device
 - Responsive remote UI with touch-friendly controls
 - Saved-device management in browser localStorage (reconnect + remove)
 - Keyboard shortcuts on desktop (arrows, Enter, Escape/Backspace)
-- Clear error handling for invalid IP, timeout, unreachable, malformed/non-Roku responses, browser blocking, disconnections, and HTTP 403 command blocking
+- Distinct handling for malformed and non-private IPs, timeout, unreachable, malformed/non-Roku responses, ambiguous browser blocking, disconnections, and HTTP 403 command blocking
 
 ## Architecture
 
@@ -55,8 +55,9 @@ Important constraints:
 
 - Vercel cannot directly access devices on a user private LAN
 - Browser sandboxing does not provide UDP multicast sockets for SSDP discovery
-- HTTPS pages may face additional private-network restrictions depending on browser/network policy
-- Some browsers/environments may block direct local IP requests entirely
+- An HTTPS deployment sends ECP requests from the browser to an HTTP device; mixed-content, CORS, and Private Network Access policy may prevent the request
+- Browser `fetch` often reports these policy failures and an unreachable device with the same opaque `TypeError`, so RokuLAN cannot always identify the exact cause
+- Direct browser-to-Roku communication has not been demonstrated universally and depends on the browser, Roku firmware/settings, and local network
 
 ### Why SSDP discovery is limited in browsers
 
@@ -65,7 +66,7 @@ Roku discovery commonly uses SSDP over UDP multicast (`239.255.255.250:1900`). S
 ## Manual connection
 
 1. Open RokuLAN in a browser on the same LAN as your Roku device.
-2. Enter the Roku private/local IPv4 address (for example `192.168.1.12`).
+2. Enter the Roku IPv4 address in `10.0.0.0/8`, `172.16.0.0/12`, or `192.168.0.0/16` (for example `192.168.1.12`). Localhost, link-local, public IPs, URLs, and paths are rejected.
 3. Connect.
 4. After successful device identification, RokuLAN stores the device in local browser storage for quick reconnect.
 
@@ -78,8 +79,8 @@ Roku discovery commonly uses SSDP over UDP multicast (`239.255.255.250:1900`). S
 
 ## Security model
 
-- Accepts only private/local IPv4 input for this milestone.
-- Prevents arbitrary URL injection by constructing fixed ECP endpoints.
+- Accepts only the three RFC 1918 private IPv4 ranges for this milestone.
+- Prevents arbitrary URL injection by constructing only allowlisted device-info and keypress ECP endpoints.
 - Treats local IP input as untrusted.
 - No secrets are required for this project.
 
@@ -99,6 +100,7 @@ npm run lint
 npm run typecheck
 npm run test
 npm run build
+npm audit
 ```
 
 ## Deployment (Vercel)
@@ -113,11 +115,11 @@ If `GET /query/device-info` succeeds but `POST /keypress/<key>` returns HTTP 403
 
 Check Roku settings related to control from mobile/network applications and allow network control where appropriate.
 
-RokuLAN does not attempt to bypass Roku security settings.
+RokuLAN keeps the successfully identified device connected and shows a restricted-control notice. It does not attempt to bypass Roku security settings.
 
 ### Browser blocked local request
 
-Try another browser/device on the same LAN, and verify your environment allows private-network access from web pages.
+The browser may expose the same generic failure for HTTPS-to-HTTP policy, CORS/Private Network Access, and an unreachable device. Try local development over HTTP or another browser/device on the same LAN, and verify your environment permits the request. This is intentionally not solved with a cloud proxy: Vercel is outside the private LAN, and a generic proxy would create an SSRF risk and disclose the Roku IP to a backend.
 
 ### Device unreachable
 

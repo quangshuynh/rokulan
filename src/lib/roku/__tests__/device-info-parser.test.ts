@@ -10,7 +10,6 @@ const SAMPLE_XML = `
   <is-tv>false</is-tv>
   <screen-size>55</screen-size>
   <power-mode>PowerOn</power-mode>
-  <network-name>HomeWifi</network-name>
   <software-version>14.0.0</software-version>
 </device-info>`;
 
@@ -24,7 +23,6 @@ describe("device info parser", () => {
       isTv: false,
       screenSize: 55,
       powerMode: "PowerOn",
-      networkName: "HomeWifi",
       softwareVersion: "14.0.0",
     });
   });
@@ -36,5 +34,24 @@ describe("device info parser", () => {
         "192.168.1.40",
       ),
     ).toThrowError(/does not appear to be a Roku/i);
+  });
+
+  it("decodes standard XML entities", () => {
+    const result = parseRokuDeviceInfo(
+      SAMPLE_XML.replace("Living Room Roku", "Living &amp; Family Roku"),
+      "192.168.1.40",
+    );
+    expect(result.friendlyName).toBe("Living & Family Roku");
+  });
+
+  it.each([
+    "not xml",
+    "<device-info><friendly-device-name>Room</friendly-device-name>",
+    "<device-info><vendor-name>Roku</vendor-name></device-info>",
+    "<!DOCTYPE x [<!ENTITY xxe SYSTEM 'file:///secret'>]><device-info><friendly-device-name>&xxe;</friendly-device-name><model-name>X</model-name></device-info>",
+  ])("rejects malformed or unsafe XML", (xml) => {
+    expect(() => parseRokuDeviceInfo(xml, "192.168.1.40")).toThrowError(
+      /valid Roku|missing required/i,
+    );
   });
 });
