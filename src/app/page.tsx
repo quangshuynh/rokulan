@@ -1,18 +1,19 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ConnectionPanel } from "@/features/connection/connection-panel";
+import {
+  createInitialSavedDevicesState,
+  hydrateSavedDevices,
+  readySavedDevices,
+} from "@/features/connection/saved-devices-state";
 import { RemoteControl } from "@/features/remote/remote-control";
 import { normalizePrivateIPv4 } from "@/lib/network/ipv4";
 import { createDirectBrowserClient } from "@/lib/roku/client";
 import { createLocalBridgeClient } from "@/lib/roku/local-bridge-client";
 import { classifyDeviceInfoError, classifyKeypressError } from "@/lib/roku/errors";
-import {
-  loadSavedDevices,
-  rememberDevice,
-  removeSavedDevice,
-} from "@/lib/storage/saved-devices";
-import type { RokuCommand, RokuDeviceInfo, RokuTransportMode, SavedRokuDevice } from "@/types/roku";
+import { rememberDevice, removeSavedDevice } from "@/lib/storage/saved-devices";
+import type { RokuCommand, RokuDeviceInfo, RokuTransportMode } from "@/types/roku";
 
 function secureContextEnabled(): boolean {
   if (typeof window === "undefined") {
@@ -28,12 +29,18 @@ export default function Home() {
     () => (transportMode === "bridge" ? createLocalBridgeClient() : createDirectBrowserClient()),
     [transportMode],
   );
-  const [savedDevices, setSavedDevices] = useState<SavedRokuDevice[]>(() =>
-    loadSavedDevices(typeof window === "undefined" ? null : window.localStorage),
-  );
+  const [savedDevicesState, setSavedDevicesState] = useState(createInitialSavedDevicesState);
   const [connectedDevice, setConnectedDevice] = useState<RokuDeviceInfo | null>(null);
   const [connectionError, setConnectionError] = useState<string | null>(null);
   const [blockedControls, setBlockedControls] = useState(false);
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      setSavedDevicesState(hydrateSavedDevices(window.localStorage));
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
+  }, []);
 
   const connect = async (rawIp: string) => {
     setConnectionError(null);
@@ -46,7 +53,7 @@ export default function Home() {
       setConnectedDevice(deviceInfo);
 
       const updatedSavedDevices = rememberDevice(window.localStorage, deviceInfo);
-      setSavedDevices(updatedSavedDevices);
+      setSavedDevicesState(readySavedDevices(updatedSavedDevices));
     } catch (error) {
       const classified = classifyDeviceInfoError(error, {
         secureContext: secureContextEnabled(),
@@ -59,7 +66,7 @@ export default function Home() {
 
   const removeSaved = (ip: string) => {
     const updated = removeSavedDevice(window.localStorage, ip);
-    setSavedDevices(updated);
+    setSavedDevicesState(readySavedDevices(updated));
   };
 
   const sendCommand = async (command: RokuCommand) => {
@@ -92,7 +99,7 @@ export default function Home() {
             setConnectionError(null);
             setBlockedControls(false);
           }}
-          savedDevices={savedDevices}
+          savedDevicesState={savedDevicesState}
           onConnect={connect}
           onRemoveSavedDevice={removeSaved}
           connectionError={connectionError}
