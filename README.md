@@ -6,7 +6,23 @@ A responsive, open-source web remote for manually connecting to and controlling 
 
 ## Screenshots
 
-- _Placeholder: add connection and remote screenshots here._
+<p align="center">
+  <img src="docs/images/rokulan-desktop-disconnected.png" alt="RokuLAN disconnected desktop interface with connection transport and IP address controls" width="720">
+</p>
+<p align="center"><sub>Desktop connection screen</sub></p>
+
+<table align="center">
+  <tr>
+    <td align="center"><strong>IP address entry</strong></td>
+    <td align="center"><strong>Connected remote</strong></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/images/rokulan-mobile-ip-entry.png" alt="RokuLAN mobile connection screen showing a synthetic dotted IPv4 address" width="240"></td>
+    <td align="center"><img src="docs/images/rokulan-mobile-connected.png" alt="RokuLAN mobile remote connected to a synthetic demonstration device" width="240"></td>
+  </tr>
+</table>
+
+<p align="center"><sub>Mobile examples use synthetic data and contain no real Roku identifiers.</sub></p>
 
 ## Current capabilities
 
