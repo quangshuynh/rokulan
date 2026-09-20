@@ -2,12 +2,13 @@
 
 import { FormEvent, useMemo, useState } from "react";
 import { BrowserDiscoveryProvider } from "@/features/discovery/browser-discovery-provider";
-import type { RokuDeviceInfo, RokuTransportMode, SavedRokuDevice } from "@/types/roku";
+import type { SavedDevicesState } from "@/features/connection/saved-devices-state";
+import type { RokuDeviceInfo, RokuTransportMode } from "@/types/roku";
 
 interface ConnectionPanelProps {
   transportMode: RokuTransportMode;
   onTransportModeChange: (mode: RokuTransportMode) => void;
-  savedDevices: SavedRokuDevice[];
+  savedDevicesState: SavedDevicesState;
   onConnect: (ip: string) => Promise<void>;
   onRemoveSavedDevice: (ip: string) => void;
   connectionError: string | null;
@@ -17,7 +18,7 @@ interface ConnectionPanelProps {
 export function ConnectionPanel({
   transportMode,
   onTransportModeChange,
-  savedDevices,
+  savedDevicesState,
   onConnect,
   onRemoveSavedDevice,
   connectionError,
@@ -133,11 +134,15 @@ export function ConnectionPanel({
 
       <div className="mt-5">
         <h3 className="text-sm font-semibold text-zinc-200">Saved devices</h3>
-        {savedDevices.length === 0 ? (
+        {savedDevicesState.status === "loading" ? (
+          <p className="mt-2 text-sm text-zinc-400" role="status">
+            Loading saved devices...
+          </p>
+        ) : savedDevicesState.devices.length === 0 ? (
           <p className="mt-2 text-sm text-zinc-400">No saved devices yet.</p>
         ) : (
           <ul className="mt-2 space-y-2">
-            {savedDevices.map((saved) => (
+            {savedDevicesState.devices.map((saved) => (
               <li key={saved.ip} className="rounded-xl border border-zinc-800 bg-zinc-950/70 p-3">
                 <div className="flex items-start justify-between gap-3">
                   <div>
