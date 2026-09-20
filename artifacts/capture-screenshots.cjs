@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
+
 const { chromium } = require(`${process.env.TEMP}\\rokulan-playwright\\node_modules\\playwright-core`);
 const fs = require('node:fs');
 const path = require('node:path');
