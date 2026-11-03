@@ -1,4 +1,4 @@
-import type { RokuDeviceInfo } from "../../types/roku";
+import type { RokuCapabilities, RokuCapabilityState, RokuDeviceInfo } from "../../types/roku";
 import { RokuError } from "../../types/roku";
 
 function readTag(xml: string, tagName: string): string | undefined {
@@ -20,6 +20,41 @@ function parseNumber(value?: string): number | undefined {
   if (!value) return undefined;
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : undefined;
+}
+
+const CAPABILITY_STATES: readonly RokuCapabilityState[] = ["supported", "unsupported", "unknown"];
+
+function parseCapability(value?: string): RokuCapabilityState {
+  const normalized = value?.trim().toLowerCase();
+  if (normalized === "true") return "supported";
+  if (normalized === "false") return "unsupported";
+  return "unknown";
+}
+
+/**
+ * Reads only the device-reported fields that gate RokuLAN controls. Missing or
+ * unrecognized values stay "unknown"; nothing is inferred from model names.
+ */
+export function parseRokuCapabilities(payload: string): RokuCapabilities {
+  const supportsFindRemote = parseCapability(readTag(payload, "supports-find-remote"));
+  const findRemotePossible = parseCapability(readTag(payload, "find-remote-is-possible"));
+  return {
+    tv: parseCapability(readTag(payload, "is-tv")),
+    findRemote:
+      supportsFindRemote === "supported" && findRemotePossible === "unsupported"
+        ? "unsupported"
+        : supportsFindRemote,
+  };
+}
+
+/** Re-validates capability data that crossed the bridge boundary as JSON. */
+export function sanitizeRokuCapabilities(value: unknown): RokuCapabilities | undefined {
+  if (typeof value !== "object" || value === null) return undefined;
+  const read = (key: keyof RokuCapabilities): RokuCapabilityState => {
+    const state = (value as Record<string, unknown>)[key];
+    return CAPABILITY_STATES.find((known) => known === state) ?? "unknown";
+  };
+  return { tv: read("tv"), findRemote: read("findRemote") };
 }
 
 export function parseRokuDeviceInfo(xml: string, ip: string): RokuDeviceInfo {
@@ -59,5 +94,6 @@ export function parseRokuDeviceInfo(xml: string, ip: string): RokuDeviceInfo {
     screenSize: parseNumber(readTag(payload, "screen-size")),
     powerMode: readTag(payload, "power-mode"),
     softwareVersion: readTag(payload, "software-version"),
+    capabilities: parseRokuCapabilities(payload),
   };
 }

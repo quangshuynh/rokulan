@@ -44,3 +44,22 @@ describe("error classification", () => {
     );
   });
 });
+
+describe("operation error classification", () => {
+  it("classifies 403 for text, apps, and launch as blocked", async () => {
+    const { classifyOperationError } = await import("@/lib/roku/errors");
+    for (const operation of ["text", "apps", "launch"] as const) {
+      const error = classifyOperationError(new RokuHttpError(403, "/x"), operation);
+      expect(error.code).toBe("http_403");
+      expect(error.message).toMatch(/HTTP 403/);
+    }
+  });
+
+  it("classifies launch HTTP failures, timeouts, and offline devices", async () => {
+    const { classifyOperationError } = await import("@/lib/roku/errors");
+    expect(classifyOperationError(new RokuHttpError(404, "/launch/12"), "launch").message).toMatch(/launch.*HTTP 404/);
+    expect(classifyOperationError(new DOMException("Aborted", "AbortError"), "apps").code).toBe("disconnected_device");
+    expect(classifyOperationError(new TypeError("Failed to fetch"), "launch").code).toBe("disconnected_device");
+    expect(classifyOperationError(new TypeError("Failed to fetch"), "text").message).toMatch(/partially|may already/i);
+  });
+});

@@ -18,6 +18,10 @@ The complete `browser UI -> loopback bridge -> Roku ECP -> real Roku` path has b
 
 - `GET /v1/roku/<validated-ip>/device` performs only `GET /query/device-info` and returns the small typed Roku device model.
 - `POST /v1/roku/<validated-ip>/keypress` accepts only JSON shaped as `{ "key": <allowlisted Roku command> }` and performs only the corresponding `POST /keypress/<key>`.
+- `POST /v1/roku/<validated-ip>/text` accepts only JSON shaped as `{ "text": <1-128 printable characters> }` and performs one `POST /keypress/Lit_<percent-encoded UTF-8 character>` per character, stopping at the first failure. Text is never logged, stored, or echoed in errors.
+- `GET /v1/roku/<validated-ip>/apps` performs only `GET /query/apps` and returns `{ "apps": [{ id, name, type }] }` after bounded parsing, de-duplication, and ID validation.
+- `POST /v1/roku/<validated-ip>/launch` accepts only JSON shaped as `{ "appId": <numeric id | "dev" | "tvinput.<name>"> }` and performs only `POST /launch/<appId>`. Launch parameters, URLs, and deep links are not accepted.
+- The device response includes a small `capabilities` object (`tv`, `findRemote`) derived only from device-reported `device-info` fields; missing or unrecognized values are `unknown`.
 - `OPTIONS` supports browser preflight only after the request Origin is accepted.
 
 Protocols, ports, URLs, arbitrary paths, query strings, public IPs, localhost targets, link-local targets, and unknown commands are rejected. Roku requests use a five-second timeout and responses are limited to 1 MiB. Browser request bodies are limited to 1 KiB. XML is parsed by the existing bounded domain parser, which rejects DTD/entity declarations and retains no sensitive hardware identifiers.
