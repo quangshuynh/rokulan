@@ -40,6 +40,10 @@ const SYSTEM_BUTTONS: CommandButton[] = [
   { label: "Power", command: "Power" },
 ];
 
+/** Keys that Roku TVs handle natively; other Roku devices may ignore them. */
+const TV_KEYS: ReadonlySet<RokuCommand> = new Set(["VolumeUp", "VolumeDown", "VolumeMute", "Power"]);
+const TV_KEYS_NOTE_ID = "remote-tv-keys-note";
+
 function buttonClassName(isPrimary = false): string {
   return [
     "min-h-12 rounded-xl border border-violet-400/20 bg-zinc-900/75 px-3 py-3 text-sm font-medium text-zinc-100",
@@ -56,6 +60,12 @@ export function RemoteControl({
   onClearBlockedNotice,
 }: RemoteControlProps) {
   const [pending, setPending] = useState<RokuCommand | null>(null);
+  // Capabilities come only from device-reported ECP fields; unknown keeps defaults.
+  const notTv = device.capabilities?.tv === "unsupported";
+  const systemButtons: CommandButton[] =
+    device.capabilities?.findRemote === "supported"
+      ? [...SYSTEM_BUTTONS, { label: "Find remote", command: "FindRemote" }]
+      : SYSTEM_BUTTONS;
 
   const sendCommand = useCallback(
     async (command: RokuCommand) => {
@@ -150,19 +160,28 @@ export function RemoteControl({
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
-          {SYSTEM_BUTTONS.map((item) => (
-            <button
-              key={item.command}
-              type="button"
-              className={buttonClassName()}
-              onClick={() => void sendCommand(item.command)}
-              aria-label={item.label}
-              disabled={pending !== null}
-            >
-              {item.label}
-            </button>
-          ))}
+        <div className="space-y-3">
+          <div className="grid grid-cols-2 gap-3">
+            {systemButtons.map((item) => (
+              <button
+                key={item.command}
+                type="button"
+                className={buttonClassName()}
+                onClick={() => void sendCommand(item.command)}
+                aria-label={item.label}
+                aria-describedby={notTv && TV_KEYS.has(item.command) ? TV_KEYS_NOTE_ID : undefined}
+                disabled={pending !== null}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+          {notTv ? (
+            <p id={TV_KEYS_NOTE_ID} className="rounded-xl border border-violet-400/15 bg-black/25 px-3 py-2 text-xs text-zinc-400">
+              This Roku reports that it is not a TV. Volume and power keys may have no effect unless it controls a
+              connected TV or audio device.
+            </p>
+          ) : null}
         </div>
       </div>
 

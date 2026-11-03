@@ -25,6 +25,11 @@ function isTypingTarget(target: EventTarget | null): boolean {
   );
 }
 
+/** Enter on a focused button or link should activate that control, not send Select. */
+function isActivatableTarget(target: EventTarget | null): boolean {
+  return target instanceof HTMLElement && (target.tagName === "BUTTON" || target.tagName === "A");
+}
+
 export function useRemoteKeyboardShortcuts(
   enabled: boolean,
   onCommand: (command: RokuCommand) => void,
@@ -34,6 +39,9 @@ export function useRemoteKeyboardShortcuts(
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (isTypingTarget(event.target)) {
+        return;
+      }
+      if (event.key === "Enter" && isActivatableTarget(event.target)) {
         return;
       }
 

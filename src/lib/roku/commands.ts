@@ -18,6 +18,8 @@ export const SUPPORTED_COMMANDS: readonly RokuCommand[] = [
   "Power",
   "PowerOn",
   "PowerOff",
+  "Backspace",
+  "FindRemote",
 ] as const;
 
 export function toKeypressPath(command: RokuCommand): `/keypress/${RokuCommand}` {

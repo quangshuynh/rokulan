@@ -31,6 +31,9 @@ A responsive, open-source web remote for manually connecting to and controlling 
 - Responsive remote UI with touch-friendly controls
 - Saved-device management in browser localStorage (reconnect + remove)
 - Keyboard shortcuts on desktop (arrows, Enter, Escape/Backspace)
+- Text entry for focused Roku search/keyboard fields (ECP `Lit_` keypresses, max 128 characters per send, never stored)
+- Installed channel list and launcher (`GET /query/apps`, `POST /launch/<id>`)
+- Capability-aware controls based only on device-reported `device-info` fields (for example, Find remote appears only when reported as supported; volume/power keys are annotated on devices reporting `is-tv=false`)
 - Distinct handling for malformed and non-private IPs, timeout, unreachable, malformed/non-Roku responses, ambiguous browser blocking, disconnections, and HTTP 403 command blocking
 - A minimal loopback-only Node/TypeScript bridge for browser-compatible local ECP access
 - Direct browser transport retained as an experimental diagnostic mode
@@ -66,6 +69,11 @@ Roku devices expose ECP on the local network, typically:
 
 - `http://<roku-ip>:8060/query/device-info`
 - `http://<roku-ip>:8060/keypress/<key>`
+- `http://<roku-ip>:8060/keypress/Lit_<UTF-8 percent-encoded character>`
+- `http://<roku-ip>:8060/query/apps`
+- `http://<roku-ip>:8060/launch/<numeric id | dev | tvinput.<name>>`
+
+Text entry, channel launch, and capability handling are tested with mocked ECP responses. Not every Roku app accepts text entry, a successful launch response means Roku accepted the request, and device-reported capabilities may not be perfectly reliable.
 
 The UI depends only on the typed `RokuClient` interface. It can use the recommended local-bridge client or the experimental direct-browser client without duplicating domain or command logic.
 
@@ -119,10 +127,10 @@ Roku discovery commonly uses SSDP over UDP multicast (`239.255.255.250:1900`). S
 ## Security model
 
 - Accepts only the three RFC 1918 private IPv4 ranges for this milestone.
-- Prevents arbitrary URL injection by constructing only allowlisted device-info and keypress ECP endpoints.
+- Prevents arbitrary URL injection by constructing only allowlisted device-info, app-list, launch, and keypress ECP endpoints (literal keypresses must be one canonical encoded character; app IDs must match a narrow pattern).
 - Treats local IP input as untrusted.
 - No secrets are required for this project.
-- The bridge binds to `127.0.0.1`, validates Host and exact Origin values, permits only two semantic operations, requires JSON for keypresses, limits request/response sizes, and reuses the RFC 1918 and command allowlists.
+- The bridge binds to `127.0.0.1`, validates Host and exact Origin values, permits only five semantic operations, requires JSON for keypress, text, and launch requests, limits request/response sizes, and reuses the RFC 1918 and command allowlists.
 
 See [Local bridge architecture and threat model](docs/local-bridge.md) for the API, configuration, and residual risks.
 See [Zero-clone distribution and mobile architecture](docs/distribution-architecture.md) for current browser/Roku constraints, candidate models, and the manual test matrix.
@@ -176,10 +184,8 @@ Verify the Roku IP address, LAN connectivity, and that the Roku is powered and c
 - Bridge packaging and a pairing/authorization design suitable for broader distribution
 - SSDP discovery through the local bridge, where UDP multicast is available
 - Installable PWA experience
-- App/channel launcher
 - Improved multi-device workflows
 - TV input controls
-- Text entry support
 - Wake/advanced ECP behaviors where supported
 
 ## Contributing

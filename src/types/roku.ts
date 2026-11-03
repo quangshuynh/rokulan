@@ -15,9 +15,24 @@ export type RokuCommand =
   | "VolumeMute"
   | "Power"
   | "PowerOn"
-  | "PowerOff";
+  | "PowerOff"
+  | "Backspace"
+  | "FindRemote";
 
 export type RokuTransportMode = "bridge" | "direct";
+
+/**
+ * Tri-state capability derived only from values the device reports over ECP.
+ * "unknown" means the field was missing or not a recognized value.
+ */
+export type RokuCapabilityState = "supported" | "unsupported" | "unknown";
+
+export interface RokuCapabilities {
+  /** Device reports `is-tv`; Roku TVs natively handle volume/power keys. */
+  tv: RokuCapabilityState;
+  /** Device reports `supports-find-remote` and `find-remote-is-possible`. */
+  findRemote: RokuCapabilityState;
+}
 
 export interface RokuDeviceInfo {
   ip: string;
@@ -28,6 +43,16 @@ export interface RokuDeviceInfo {
   screenSize?: number;
   powerMode?: string;
   softwareVersion?: string;
+  /** Optional so older bridges and saved data remain compatible. */
+  capabilities?: RokuCapabilities;
+}
+
+export type RokuAppType = "appl" | "tvin" | "menu" | "unknown";
+
+export interface RokuApp {
+  id: string;
+  name: string;
+  type: RokuAppType;
 }
 
 export interface SavedRokuDevice {
@@ -48,6 +73,9 @@ export type RokuErrorCode =
   | "http_403"
   | "malformed_device_response"
   | "disconnected_device"
+  | "invalid_text"
+  | "invalid_app_id"
+  | "malformed_apps_response"
   | "unknown_error";
 
 export class RokuError extends Error {

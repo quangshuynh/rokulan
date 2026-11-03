@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { ChannelLauncher } from "@/features/channels/channel-launcher";
 import { ConnectionPanel } from "@/features/connection/connection-panel";
 import {
   createInitialSavedDevicesState,
@@ -8,12 +9,13 @@ import {
   readySavedDevices,
 } from "@/features/connection/saved-devices-state";
 import { RemoteControl } from "@/features/remote/remote-control";
+import { TextEntryPanel } from "@/features/text-entry/text-entry-panel";
 import { normalizePrivateIPv4 } from "@/lib/network/ipv4";
 import { createDirectBrowserClient } from "@/lib/roku/client";
 import { createLocalBridgeClient } from "@/lib/roku/local-bridge-client";
-import { classifyDeviceInfoError, classifyKeypressError } from "@/lib/roku/errors";
+import { classifyDeviceInfoError, classifyKeypressError, classifyOperationError } from "@/lib/roku/errors";
 import { rememberDevice, removeSavedDevice } from "@/lib/storage/saved-devices";
-import type { RokuCommand, RokuDeviceInfo, RokuTransportMode } from "@/types/roku";
+import type { RokuApp, RokuCommand, RokuDeviceInfo, RokuTransportMode } from "@/types/roku";
 
 function secureContextEnabled(): boolean {
   if (typeof window === "undefined") {
@@ -88,6 +90,51 @@ export default function Home() {
     }
   };
 
+  const connectedIp = connectedDevice?.ip;
+
+  // These handlers throw classified errors so each panel can show local feedback.
+  const sendText = useCallback(
+    async (text: string) => {
+      if (!connectedIp) return;
+      try {
+        await client.sendText(connectedIp, text);
+      } catch (error) {
+        throw classifyOperationError(error, "text");
+      }
+    },
+    [client, connectedIp],
+  );
+
+  const sendBackspace = useCallback(async () => {
+    if (!connectedIp) return;
+    try {
+      await client.sendKeypress(connectedIp, "Backspace");
+    } catch (error) {
+      throw classifyKeypressError(error);
+    }
+  }, [client, connectedIp]);
+
+  const loadApps = useCallback(async (): Promise<RokuApp[]> => {
+    if (!connectedIp) return [];
+    try {
+      return await client.queryApps(connectedIp);
+    } catch (error) {
+      throw classifyOperationError(error, "apps");
+    }
+  }, [client, connectedIp]);
+
+  const launchApp = useCallback(
+    async (app: RokuApp) => {
+      if (!connectedIp) return;
+      try {
+        await client.launchApp(connectedIp, app.id);
+      } catch (error) {
+        throw classifyOperationError(error, "launch");
+      }
+    },
+    [client, connectedIp],
+  );
+
   return (
     <main className="relative mx-auto flex min-h-screen w-full max-w-[100vw] flex-1 flex-col gap-6 overflow-hidden px-3 py-5 sm:px-6 sm:py-8 lg:max-w-6xl lg:flex-row lg:items-start lg:py-10">
       <div className="min-w-0 w-full lg:max-w-md">
@@ -107,14 +154,18 @@ export default function Home() {
         />
       </div>
 
-      <div className="min-w-0 w-full">
+      <div className="min-w-0 w-full space-y-5">
         {connectedDevice ? (
-          <RemoteControl
-            device={connectedDevice}
-            blockedControls={blockedControls}
-            onCommand={sendCommand}
-            onClearBlockedNotice={() => setBlockedControls(false)}
-          />
+          <>
+            <RemoteControl
+              device={connectedDevice}
+              blockedControls={blockedControls}
+              onCommand={sendCommand}
+              onClearBlockedNotice={() => setBlockedControls(false)}
+            />
+            <TextEntryPanel key={`text-${connectedDevice.ip}`} onSend={sendText} onBackspace={sendBackspace} />
+            <ChannelLauncher key={`apps-${connectedDevice.ip}`} loadApps={loadApps} onLaunch={launchApp} />
+          </>
         ) : (
           <section className="max-w-full overflow-hidden rounded-3xl border border-violet-400/15 bg-zinc-950/55 p-6 text-center text-zinc-300 backdrop-blur-sm sm:p-8">
             <div className="mx-auto mb-4 grid size-14 place-items-center rounded-2xl border border-violet-400/30 bg-violet-500/10 text-2xl text-violet-300" aria-hidden="true">⌁</div>
